@@ -8,7 +8,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharac
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 
 def load_document(file_path: str):
@@ -32,7 +32,8 @@ def load_document(file_path: str):
         
     docs = loader.load()
     # Add timestamp and filename to metadata
-    timestamp = datetime.now(timezone.utc).isoformat()
+    ist = timezone(timedelta(hours=5, minutes=30))
+    timestamp = datetime.now(ist).isoformat()
     filename = os.path.basename(file_path)
     for doc in docs:
         doc.metadata["timestamp"] = timestamp
