@@ -1,5 +1,11 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+import os
+
+# Load environment variables explicitly
+load_dotenv()
+
 from app.api.documents import router as documents_router
 from app.api.query import router as query_router
 from app.api.feedback import router as feedback_router

@@ -15,11 +15,11 @@ def analyze_query(state: GraphState):
     print("---ANALYZING INITIAL QUERY---")
     query = state.original_query
 
-    llm = get_llm(temperature=0)
-    structured_llm_analyzer = llm.with_structured_output(QueryAnalysis)
+    structured_llm_analyzer = get_llm(temperature=0, structured_output=QueryAnalysis, method="json_mode")
 
     system = """You are a query analyzer for a technical documentation RAG system. \n
-    Rewrite the question for vectorstore retrieval and classify it into: 'conceptual', 'how-to', 'troubleshooting', or 'API reference'."""
+    Rewrite the question for vectorstore retrieval and classify it into: 'conceptual', 'how-to', 'troubleshooting', or 'API reference'. \n
+    You MUST respond in JSON format with keys "rewritten_query" and "query_type"."""
 
     analysis_prompt = ChatPromptTemplate.from_messages(
         [

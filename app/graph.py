@@ -5,15 +5,8 @@ from app.nodes.retrieve import retrieve
 from app.nodes.grade import grade_documents
 from app.nodes.transform import transform_query
 from app.nodes.generate import generate
+from app.nodes.web_search import web_search
 from app.edges import decide_to_generate, check_retry_limit
-
-def web_search_placeholder(state: GraphState):
-    """
-    Placeholder node for web search fallback.
-    Implementation deferred to later phases.
-    """
-    print("---WEB SEARCH FALLBACK (PLACEHOLDER)---")
-    return {"generation": "I'm sorry, I couldn't find relevant information in the local documentation and web search is currently offline."}
 
 def create_graph():
     """
@@ -27,7 +20,7 @@ def create_graph():
     workflow.add_node("grade_documents", grade_documents)
     workflow.add_node("transform_query", transform_query)
     workflow.add_node("generate", generate)
-    workflow.add_node("web_search", web_search_placeholder)
+    workflow.add_node("web_search", web_search)
 
     # Build Graph
     workflow.set_entry_point("analyze_query")

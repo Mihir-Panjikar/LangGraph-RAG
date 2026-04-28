@@ -25,6 +25,7 @@ dependencies = [
     "aiosqlite>=0.20.0",
     "streamlit>=1.45.0",
     "httpx>=0.28.0",
+    "tavily-python>=0.7.24",
 ]
 
 [dependency-groups]

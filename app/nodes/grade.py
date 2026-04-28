@@ -25,13 +25,13 @@ def grade_documents(state: GraphState):
     documents = state.documents
 
     # LLM with structured output
-    llm = get_llm(temperature=0)
-    structured_llm_grader = llm.with_structured_output(GradeDocuments)
+    structured_llm_grader = get_llm(temperature=0, structured_output=GradeDocuments, method="json_mode")
 
     # Prompt
     system = """You are a grader assessing relevance of a retrieved document to a user question. \n
     If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n
-    Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."""
+    Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question. \n
+    You MUST respond in JSON format with a single key "binary_score"."""
 
     grade_prompt = ChatPromptTemplate.from_messages(
         [

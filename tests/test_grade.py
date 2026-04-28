@@ -19,9 +19,7 @@ def test_grade_documents_filters_irrelevant():
     with patch("app.nodes.grade.get_llm") as mock_get_llm, \
          patch("app.nodes.grade.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_get_llm.return_value
-        mock_grader = MagicMock()
-        mock_llm.with_structured_output.return_value = mock_grader
+        mock_grader = mock_get_llm.return_value
         
         mock_prompt = mock_prompt_class.from_messages.return_value
         mock_chain = MagicMock()
@@ -49,9 +47,7 @@ def test_grade_documents_all_irrelevant():
     with patch("app.nodes.grade.get_llm") as mock_get_llm, \
          patch("app.nodes.grade.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_get_llm.return_value
-        mock_grader = MagicMock()
-        mock_llm.with_structured_output.return_value = mock_grader
+        mock_grader = mock_get_llm.return_value
         
         mock_prompt = mock_prompt_class.from_messages.return_value
         mock_chain = MagicMock()

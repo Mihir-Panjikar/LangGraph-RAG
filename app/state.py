@@ -13,6 +13,7 @@ class GraphState(BaseModel):
     query_type: str = Field(default="general", description="The classification of the query (e.g., conceptual, how-to, API reference).")
     documents: List[Document] = Field(default_factory=list, description="The raw chunks retrieved from the vector store.")
     relevant_documents: List[Document] = Field(default_factory=list, description="The chunks that have passed the grading node.")
+    web_search_results: Optional[str] = Field(default=None, description="The results retrieved from web search fallback.")
     num_retries: int = Field(default=0, description="Counter for tracking self-correction loops.")
     generation: str = Field(default="", description="The final generated answer.")
 

@@ -16,7 +16,8 @@ def transform_query(state: GraphState):
 
     system = f"""You are a query rewriter for a RAG system. The previous retrieval attempt for a '{query_type}' query failed. \n
     Formulate an improved version of the question that might find better results in the documentation. \n
-    If it's 'conceptual', broaden the search. If it's 'API reference', ensure parameters are explicit."""
+    If it's 'conceptual', broaden the search. If it's 'API reference', ensure parameters are explicit.\n
+    Output ONLY the new query string. Do NOT include any conversational text, explanations, or quotes."""
 
     re_write_prompt = ChatPromptTemplate.from_messages(
         [

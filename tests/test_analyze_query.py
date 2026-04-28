@@ -10,9 +10,7 @@ def test_analyze_query_node_rewrites_and_classifies():
     with patch("app.nodes.analyze_query.get_llm") as mock_get_llm, \
          patch("app.nodes.analyze_query.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_get_llm.return_value
-        mock_analyzer = MagicMock()
-        mock_llm.with_structured_output.return_value = mock_analyzer
+        mock_analyzer = mock_get_llm.return_value
         
         mock_prompt = mock_prompt_class.from_messages.return_value
         mock_chain = MagicMock()

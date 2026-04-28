@@ -44,3 +44,13 @@ def test_graph_state_retry_increment():
     assert state.num_retries == 0
     state.num_retries += 1
     assert state.num_retries == 1
+
+def test_graph_state_web_search_results():
+    """Test that GraphState can store web search results."""
+    state = GraphState(original_query="test")
+    assert state.web_search_results is None
+    
+    results = "Synthesized answer from Tavily with sources."
+    state.web_search_results = results
+    assert state.web_search_results == results
+
