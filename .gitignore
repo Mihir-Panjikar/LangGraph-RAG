@@ -55,3 +55,7 @@ conductor/
 .DS_Store
 Thumbs.db
 test_chroma_db/
+# Local documentation
+project_report.md
+spec.md
+
