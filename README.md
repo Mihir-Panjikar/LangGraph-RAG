@@ -81,6 +81,22 @@ curl -X POST http://localhost:8000/feedback \
      -d '{"query_id": "uuid-123", "rating": 1, "comment": "Great answer!"}'
 ```
 
+### 4. List Indexed Documents
+**Endpoint:** `GET /documents`
+```bash
+curl -X GET http://localhost:8000/documents
+```
+**Response:**
+```json
+[
+  {
+    "filename": "programming.txt",
+    "chunk_count": 12,
+    "timestamp": "2026-04-28T10:00:00"
+  }
+]
+```
+
 ---
 
 ## Architecture & Design Decisions
