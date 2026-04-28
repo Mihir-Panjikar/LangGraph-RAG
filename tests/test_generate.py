@@ -12,10 +12,10 @@ def test_generate_node_produces_answer():
         relevant_documents=[doc1]
     )
     
-    with patch("app.nodes.generate.ChatGroq") as mock_llm_class, \
+    with patch("app.nodes.generate.get_llm") as mock_get_llm, \
          patch("app.nodes.generate.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_llm_class.return_value
+        mock_llm = mock_get_llm.return_value
         mock_prompt = mock_prompt_class.from_messages.return_value
         
         # Mock the chain: prompt | llm | StrOutputParser

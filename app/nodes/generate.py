@@ -1,7 +1,7 @@
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from app.state import GraphState
+from app.utils import get_llm
 
 def generate(state: GraphState):
     """
@@ -18,7 +18,7 @@ def generate(state: GraphState):
     documents = state.relevant_documents
 
     # LLM
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+    llm = get_llm(temperature=0)
 
     # Prompt
     prompt = ChatPromptTemplate.from_messages(

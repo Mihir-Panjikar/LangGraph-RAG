@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import GraphState
+from app.utils import get_llm
 
 class GradeDocuments(BaseModel):
     """Binary score for relevance check on retrieved documents."""
@@ -12,6 +12,7 @@ class GradeDocuments(BaseModel):
 def grade_documents(state: GraphState):
     """
     Determines whether the retrieved documents are relevant to the question.
+    Uses parallel batching for efficiency.
 
     Args:
         state (GraphState): The current graph state.
@@ -19,19 +20,19 @@ def grade_documents(state: GraphState):
     Returns:
         dict: Filtered relevant documents.
     """
-    print("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
-    query = state.original_query
+    print("---CHECKING DOCUMENT RELEVANCE (BATCHED)---")
+    query = state.current_query # Use optimized query for better matching
     documents = state.documents
 
     # LLM with structured output
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+    llm = get_llm(temperature=0)
     structured_llm_grader = llm.with_structured_output(GradeDocuments)
 
     # Prompt
-    system = """You are a grader assessing relevance of a retrieved document to a user question. \n 
-    If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n 
+    system = """You are a grader assessing relevance of a retrieved document to a user question. \n
+    If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n
     Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."""
-    
+
     grade_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system),
@@ -41,15 +42,18 @@ def grade_documents(state: GraphState):
 
     grader_chain = grade_prompt | structured_llm_grader
 
-    relevant_docs = []
-    for d in documents:
-        res = grader_chain.invoke({"question": query, "document": d.page_content})
-        score = res.binary_score
-        if score == "yes":
-            print("---GRADE: DOCUMENT RELEVANT---")
-            relevant_docs.append(d)
-        else:
-            print("---GRADE: DOCUMENT NOT RELEVANT---")
-            continue
+    # Prepare batch inputs
+    inputs = [{"question": query, "document": d.page_content} for d in documents]
     
+    # Run batch grading in parallel
+    results = grader_chain.batch(inputs)
+
+    relevant_docs = []
+    for i, res in enumerate(results):
+        if res.binary_score == "yes":
+            print(f"---GRADE: DOCUMENT {i} RELEVANT---")
+            relevant_docs.append(documents[i])
+        else:
+            print(f"---GRADE: DOCUMENT {i} NOT RELEVANT---")
+
     return {"relevant_documents": relevant_docs}

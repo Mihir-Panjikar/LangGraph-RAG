@@ -10,10 +10,11 @@ def test_transform_query_node_rewrites_query():
         current_query="What is LangGraph?"
     )
     
-    with patch("app.nodes.transform.ChatGroq") as mock_llm_class, \
+    with patch("app.nodes.transform.get_llm") as mock_get_llm, \
          patch("app.nodes.transform.ChatPromptTemplate") as mock_prompt_class:
-        
-        mock_llm = mock_llm_class.return_value
+
+        mock_llm = mock_get_llm.return_value
+
         mock_prompt = mock_prompt_class.from_messages.return_value
         
         mock_chain_1 = MagicMock()

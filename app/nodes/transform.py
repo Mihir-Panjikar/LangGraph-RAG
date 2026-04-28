@@ -1,42 +1,30 @@
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from app.state import GraphState
+from app.utils import get_llm
 
 def transform_query(state: GraphState):
     """
-    Transform the query to produce a better question for retrieval.
-
-    Args:
-        state (GraphState): The current graph state.
-
-    Returns:
-        dict: The transformed query.
+    Transform the query for a RE-RETRIEVAL attempt.
     """
-    print("---TRANSFORMING QUERY---")
+    print("---TRANSFORMING QUERY FOR RETRY---")
     query = state.original_query
+    query_type = state.query_type
 
-    # LLM
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+    llm = get_llm(temperature=0)
 
-    # Prompt
-    system = """You are a query rewriter that converts an input question to a better version optimized \n 
-     for vectorstore retrieval. Look at the input and try to reason about the underlying semantic intent / meaning."""
-    
+    system = f"""You are a query rewriter for a RAG system. The previous retrieval attempt for a '{query_type}' query failed. \n
+    Formulate an improved version of the question that might find better results in the documentation. \n
+    If it's 'conceptual', broaden the search. If it's 'API reference', ensure parameters are explicit."""
+
     re_write_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system),
-            (
-                "human",
-                "Here is the initial question: \n\n {question} \n Formulate an improved question.",
-            ),
+            ("human", "Initial question: {question}"),
         ]
     )
 
-    # Chain
     rewriter_chain = re_write_prompt | llm | StrOutputParser()
-
-    # Run
     better_query = rewriter_chain.invoke({"question": query})
-    
+
     return {"current_query": better_query}

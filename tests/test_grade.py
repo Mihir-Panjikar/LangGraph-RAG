@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from langchain_core.documents import Document
 from app.state import GraphState
-from app.nodes.grade import grade_documents
+from app.nodes.grade import grade_documents, GradeDocuments
 
 def test_grade_documents_filters_irrelevant():
     """Test that the grader filters out irrelevant documents and keeps relevant ones."""
@@ -16,23 +16,19 @@ def test_grade_documents_filters_irrelevant():
     )
     
     # Mock the chain
-    with patch("app.nodes.grade.ChatGroq") as mock_llm_class, \
+    with patch("app.nodes.grade.get_llm") as mock_get_llm, \
          patch("app.nodes.grade.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_llm_class.return_value
+        mock_llm = mock_get_llm.return_value
         mock_grader = MagicMock()
         mock_llm.with_structured_output.return_value = mock_grader
         
         mock_prompt = mock_prompt_class.from_messages.return_value
-        
-        # Mock the pipe operator: prompt | structured_llm
-        # In the code: grader_chain = grade_prompt | structured_llm_grader
         mock_chain = MagicMock()
         mock_prompt.__or__.return_value = mock_chain
         
-        # Return actual GradeDocuments instances
-        from app.nodes.grade import GradeDocuments
-        mock_chain.invoke.side_effect = [
+        # Mock batch instead of invoke
+        mock_chain.batch.return_value = [
             GradeDocuments(binary_score="yes"),
             GradeDocuments(binary_score="no")
         ]
@@ -43,17 +39,17 @@ def test_grade_documents_filters_irrelevant():
         # Assertions
         assert len(new_state["relevant_documents"]) == 1
         assert new_state["relevant_documents"][0].page_content == "LangGraph is for building stateful agents."
-        assert mock_chain.invoke.call_count == 2
+        assert mock_chain.batch.call_count == 1
 
 def test_grade_documents_all_irrelevant():
     """Test behavior when no documents are relevant."""
     doc = Document(page_content="Irrelevant info")
     state = GraphState(original_query="Relevant query", documents=[doc])
     
-    with patch("app.nodes.grade.ChatGroq") as mock_llm_class, \
+    with patch("app.nodes.grade.get_llm") as mock_get_llm, \
          patch("app.nodes.grade.ChatPromptTemplate") as mock_prompt_class:
         
-        mock_llm = mock_llm_class.return_value
+        mock_llm = mock_get_llm.return_value
         mock_grader = MagicMock()
         mock_llm.with_structured_output.return_value = mock_grader
         
@@ -61,8 +57,7 @@ def test_grade_documents_all_irrelevant():
         mock_chain = MagicMock()
         mock_prompt.__or__.return_value = mock_chain
         
-        from app.nodes.grade import GradeDocuments
-        mock_chain.invoke.return_value = GradeDocuments(binary_score="no")
+        mock_chain.batch.return_value = [GradeDocuments(binary_score="no")]
         
         new_state = grade_documents(state)
         
