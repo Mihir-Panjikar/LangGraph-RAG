@@ -1,5 +1,6 @@
 import os
 import asyncio
+from huggingface_hub import snapshot_download
 from app.database import engine, Base
 from app.ingestion import load_document, chunk_documents, create_vector_store
 # Import models to ensure they are registered with Base.metadata
@@ -13,6 +14,21 @@ async def initialize_database():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("Database initialization complete.")
+
+def check_and_download_model(model_name: str = "sentence-transformers/all-MiniLM-L6-v2", local_dir: str = "models/all-MiniLM-L6-v2"):
+    """
+    Check if the embedding model exists locally; if not, download it.
+    """
+    if os.path.exists(local_dir) and len(os.listdir(local_dir)) > 0:
+        print(f"Model found at {local_dir}. Skipping download.")
+    else:
+        print(f"Model not found at {local_dir}. Downloading {model_name}...")
+        snapshot_download(
+            repo_id=model_name,
+            local_dir=local_dir,
+            local_dir_use_symlinks=False
+        )
+        print("Download complete.")
 
 def run_ingestion(data_dir: str, persist_db: str):
     """
@@ -52,9 +68,10 @@ def run_ingestion(data_dir: str, persist_db: str):
 
 async def run_setup(data_dir: str = "data", persist_db: str = "chroma_db"):
     """
-    Run the full project setup: DB initialization and ingestion.
+    Run the full project setup: Model check, DB initialization and ingestion.
     """
     print("=== LangGraph RAG Project Setup ===")
+    check_and_download_model()
     await initialize_database()
     run_ingestion(data_dir, persist_db)
     print("=== Setup Finished Successfully ===")
