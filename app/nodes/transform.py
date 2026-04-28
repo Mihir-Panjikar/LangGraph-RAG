@@ -10,6 +10,7 @@ def transform_query(state: GraphState):
     print("---TRANSFORMING QUERY FOR RETRY---")
     query = state.original_query
     query_type = state.query_type
+    num_retries = state.num_retries
 
     llm = get_llm(temperature=0)
 
@@ -27,4 +28,4 @@ def transform_query(state: GraphState):
     rewriter_chain = re_write_prompt | llm | StrOutputParser()
     better_query = rewriter_chain.invoke({"question": query})
 
-    return {"current_query": better_query}
+    return {"current_query": better_query, "num_retries": num_retries + 1}
