@@ -8,8 +8,10 @@ A high-performance, self-corrective Retrieval-Augmented Generation (RAG) system 
 - **Multi-Format Ingestion:** Seamlessly processes PDF, Markdown, Microsoft Word (.docx), and Plain Text files.
 - **Semantic Chunking:** Implements a structural, two-pass splitting strategy to preserve document context and hierarchy.
 - **Offline-First Embeddings:** Utilizes local Hugging Face `all-MiniLM-L6-v2` models for privacy and consistent performance without external API latency.
-- **Self-Correction:** Automatically grades retrieved documents and hallucinates checks on generated answers to ensure high fidelity.
+- **Self-Correction:** Automatically grades retrieved documents and hallucination checks on generated answers to ensure high fidelity.
+- **Type-Safe State Management:** Employs Pydantic-powered `GraphState` to ensure robust data integrity across the entire agentic lifecycle.
 - **Modern Backend:** Served via a robust FastAPI layer with auto-generated OpenAPI documentation.
+
 
 ## Technical Architecture
 
