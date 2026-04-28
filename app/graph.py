@@ -45,8 +45,6 @@ def create_graph():
     )
 
     # Conditional Edge: After transforming the query, check if we should retry retrieval or fallback
-    # Wait, transform_query increments num_retries. 
-    # If we put the check AFTER transform_query, it's perfect.
     workflow.add_conditional_edges(
         "transform_query",
         check_retry_limit,
