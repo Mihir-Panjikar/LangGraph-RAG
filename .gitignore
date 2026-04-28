@@ -36,6 +36,7 @@ chroma/
 *.db
 *.sqlite
 data_storage/
+models/
 
 # IDEs
 .vscode/
