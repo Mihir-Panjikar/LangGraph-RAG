@@ -37,3 +37,10 @@ def test_graph_state_type_validation():
     with pytest.raises(ValidationError):
         # documents should be a list of Documents
         GraphState(original_query="test", documents=["not a document"])
+
+def test_graph_state_retry_increment():
+    """Test that retry_count can be incremented."""
+    state = GraphState(original_query="test")
+    assert state.retry_count == 0
+    state.retry_count += 1
+    assert state.retry_count == 1
