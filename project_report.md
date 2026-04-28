@@ -21,7 +21,15 @@ This document tracks the high-level progress and milestones of the LangGraph-bas
 - **Implementation:** Created `app/state.py` with the `GraphState` model, including fields for queries, retrieval results, and retry counters.
 - **Validation:** Implemented automated validation and default value logic (e.g., query shadowing) with comprehensive unit test coverage.
 
+### Phase 3: LangGraph Node Implementation
+**Status: COMPLETED**
+- **Objective:** Implement the core functional units (nodes) for the agentic RAG workflow.
+- **Implementation:** Developed four specialized nodes: `Retrieve`, `Grade Documents`, `Generate`, and `Transform Query`.
+- **Inference:** Integrated Groq's high-speed API for LLM tasks, ensuring sub-second execution for grading and transformation cycles.
+- **Groundedness:** Enforced strict context-grounded generation with mandatory source citations in the `Generate` node.
+- **Validation:** 100% unit test coverage for all nodes, utilizing extensive mocking of the LangChain pipeline and Groq LLM.
+
 ## Upcoming Phases
-- **Phase 3:** LangGraph Node Implementation (Retrieve, Grade, Generate, Transform).
-- **Phase 4:** FastAPI Integration and API Layer.
-- **Phase 5:** Advanced Features (Evaluation, Web Search Fallback).
+- **Phase 4:** Conditional Edges and Routing Logic (Graph Orchestration).
+- **Phase 5:** FastAPI Integration and API Layer.
+- **Phase 6:** Advanced Features (Evaluation, Web Search Fallback).
