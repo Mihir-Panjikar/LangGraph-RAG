@@ -19,6 +19,8 @@ dependencies = [
     "sentence-transformers>=5.4.1",
     "tokenizers<0.21.0",
     "unstructured>=0.22.23",
+    "uvicorn>=0.46.0",
+    "python-multipart>=0.0.9",
 ]
 
 [dependency-groups]

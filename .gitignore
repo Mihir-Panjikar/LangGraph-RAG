@@ -33,6 +33,8 @@ venv.bak/
 
 # Vector Store / Database
 chroma/
+chroma_db/
+.coverage
 *.db
 *.sqlite
 data_storage/
