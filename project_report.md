@@ -29,7 +29,14 @@ This document tracks the high-level progress and milestones of the LangGraph-bas
 - **Groundedness:** Enforced strict context-grounded generation with mandatory source citations in the `Generate` node.
 - **Validation:** 100% unit test coverage for all nodes, utilizing extensive mocking of the LangChain pipeline and Groq LLM.
 
+### Phase 4: Conditional Edges and Routing Logic
+**Status: COMPLETED**
+- **Objective:** Orchestrate the functional nodes into a cohesive, self-corrective workflow.
+- **Orchestration:** Compiled the LangGraph `StateGraph`, connecting `analyze`, `retrieve`, `grade`, `transform`, and `generate` nodes.
+- **Routing:** Implemented conditional routing logic to automatically decide between direct generation, query transformation, or fallback based on document relevance.
+- **Self-Correction:** Enforced a hard-cap of 3 retries for the query transformation loop to ensure system stability.
+- **Validation:** Achieved >95% test coverage for the graph orchestration layer, including routing logic and state transition verification.
+
 ## Upcoming Phases
-- **Phase 4:** Conditional Edges and Routing Logic (Graph Orchestration).
 - **Phase 5:** FastAPI Integration and API Layer.
 - **Phase 6:** Advanced Features (Evaluation, Web Search Fallback).
