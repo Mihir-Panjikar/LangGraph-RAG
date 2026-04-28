@@ -10,6 +10,7 @@ dependencies = [
     "fastapi>=0.136.1",
     "langchain>=1.2.15",
     "langchain-community>=0.4.1",
+    "langchain-groq>=1.1.2",
     "langchain-huggingface>=1.2.2",
     "langgraph>=1.1.10",
     "markdown>=3.10.2",
