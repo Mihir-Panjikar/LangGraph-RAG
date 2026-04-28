@@ -54,3 +54,4 @@ conductor/
 # OS
 .DS_Store
 Thumbs.db
+test_chroma_db/
