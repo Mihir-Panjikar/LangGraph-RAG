@@ -47,8 +47,6 @@ models/
 *.swo
 
 # Project Specific
-data/
-!data/.gitkeep
 docs/design_decisions.md
 conductor/
 
