@@ -10,11 +10,11 @@ def test_graph_state_valid_initialization():
         current_query="What is LangGraph?",
         documents=[Document(page_content="LangGraph is a library...")],
         relevant_documents=[],
-        retry_count=0,
+        num_retries=0,
         generation=""
     )
     assert state.original_query == "What is LangGraph?"
-    assert state.retry_count == 0
+    assert state.num_retries == 0
     assert len(state.documents) == 1
 
 def test_graph_state_defaults():
@@ -25,22 +25,22 @@ def test_graph_state_defaults():
     assert state.current_query == "test"
     assert state.documents == []
     assert state.relevant_documents == []
-    assert state.retry_count == 0
+    assert state.num_retries == 0
     assert state.generation == ""
 
 def test_graph_state_type_validation():
     """Test that GraphState validates field types."""
     with pytest.raises(ValidationError):
-        # retry_count should be an int
-        GraphState(original_query="test", retry_count="not an int")
+        # num_retries should be an int
+        GraphState(original_query="test", num_retries="not an int")
 
     with pytest.raises(ValidationError):
         # documents should be a list of Documents
         GraphState(original_query="test", documents=["not a document"])
 
 def test_graph_state_retry_increment():
-    """Test that retry_count can be incremented."""
+    """Test that num_retries can be incremented."""
     state = GraphState(original_query="test")
-    assert state.retry_count == 0
-    state.retry_count += 1
-    assert state.retry_count == 1
+    assert state.num_retries == 0
+    state.num_retries += 1
+    assert state.num_retries == 1
