@@ -8,6 +8,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharac
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 import os
+from datetime import datetime, timezone
 
 def load_document(file_path: str):
     """
@@ -28,7 +29,14 @@ def load_document(file_path: str):
     else:
         raise ValueError(f"Unsupported file format: {ext}")
         
-    return loader.load()
+    docs = loader.load()
+    # Add timestamp and filename to metadata
+    timestamp = datetime.now(timezone.utc).isoformat()
+    filename = os.path.basename(file_path)
+    for doc in docs:
+        doc.metadata["timestamp"] = timestamp
+        doc.metadata["filename"] = filename
+    return docs
 
 def chunk_documents(documents, chunk_size=1000, chunk_overlap=100):
     """
@@ -90,3 +98,30 @@ def search_vector_store(query, persist_directory="chroma_db", k=3):
     embeddings = get_embeddings()
     vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
     return vector_store.similarity_search(query, k=k)
+
+def run_ingestion(target_path: str = None, data_dir: str = "data", persist_db: str = "chroma_db"):
+    """
+    Ingest documents from target_path (if file) or all documents from data_dir.
+    """
+    all_documents = []
+    supported_exts = [".pdf", ".md", ".docx", ".txt"]
+    
+    if target_path and os.path.isfile(target_path):
+        # Ingest single file
+        all_documents.extend(load_document(target_path))
+    else:
+        # Re-scan directory
+        for file in os.listdir(data_dir):
+            ext = os.path.splitext(file)[1].lower()
+            if ext in supported_exts:
+                file_path = os.path.join(data_dir, file)
+                try:
+                    all_documents.extend(load_document(file_path))
+                except Exception:
+                    continue
+    
+    if not all_documents:
+        return
+        
+    chunks = chunk_documents(all_documents)
+    create_vector_store(chunks, persist_directory=persist_db)
