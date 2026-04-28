@@ -1,0 +1,11 @@
+[Type]: [What was added or modified] - [Explanation of why it was added or modified]
+
+# Rules for generation:
+# 1. "Type" must be a standard conventional commit tag (feat, fix, docs, refactor, test, chore).
+# 2. "What" must be a concise, imperative statement of the technical change.
+# 3. "Why" must explicitly state the architectural or functional reason for the change, referencing LangGraph state, FastAPI requirements, or assignment constraints where applicable.
+
+# Accepted Examples:
+# feat: Implement document grading node - Required to evaluate chunk relevance and trigger the self-corrective routing fallback.
+# refactor: Change GraphState to use Pydantic BaseModel - Needed to enforce strict type checking on the retry_count integer during workflow execution.
+# chore: Add python-multipart dependency - Necessary for the FastAPI /ingest endpoint to accept file uploads.
