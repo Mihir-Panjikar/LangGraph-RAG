@@ -17,11 +17,10 @@ def test_run_ingestion_integration(tmp_path):
     
     # Run ingestion
     run_ingestion(
-        target_path=str(sample_file),
+        target_paths=[str(sample_file)],
         data_dir=str(test_data_dir),
         persist_db=str(test_chroma_db)
     )
-    
     # Verify vector store
     embeddings = get_embeddings()
     vector_store = Chroma(

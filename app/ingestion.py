@@ -9,6 +9,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 import os
 from datetime import datetime, timezone
+from typing import List, Optional
 
 def load_document(file_path: str):
     """
@@ -99,16 +100,21 @@ def search_vector_store(query, persist_directory="chroma_db", k=3):
     vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
     return vector_store.similarity_search(query, k=k)
 
-def run_ingestion(target_path: str = None, data_dir: str = "data", persist_db: str = "chroma_db"):
+def run_ingestion(target_paths: List[str] = None, data_dir: str = "data", persist_db: str = "chroma_db"):
     """
-    Ingest documents from target_path (if file) or all documents from data_dir.
+    Ingest documents from target_paths (if provided) or all documents from data_dir.
     """
     all_documents = []
     supported_exts = [".pdf", ".md", ".docx", ".txt"]
     
-    if target_path and os.path.isfile(target_path):
-        # Ingest single file
-        all_documents.extend(load_document(target_path))
+    if target_paths:
+        # Ingest specific files
+        for path in target_paths:
+            if os.path.isfile(path):
+                try:
+                    all_documents.extend(load_document(path))
+                except Exception:
+                    continue
     else:
         # Re-scan directory
         for file in os.listdir(data_dir):

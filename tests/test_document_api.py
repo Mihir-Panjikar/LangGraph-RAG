@@ -47,7 +47,7 @@ def test_ingest_file_success():
             
             assert response.status_code == 200
             assert "Successfully ingested: test.pdf" in response.json()["message"]
-            mock_ingest.assert_called_once_with(target_path=expected_path)
+            mock_ingest.assert_called_once_with(target_paths=[expected_path])
 
 def test_ingest_invalid_extension():
     files = [("files", ("test.exe", b"binary content", "application/octet-stream"))]
@@ -70,7 +70,11 @@ def test_ingest_multiple_files_mixed():
             
             assert response.status_code == 200
             assert "Successfully ingested: test1.pdf, test2.txt" in response.json()["message"]
-            assert mock_ingest.call_count == 2
+            # Batched ingestion calls run_ingestion once with all valid paths
+            assert mock_ingest.call_count == 1
+            call_args = mock_ingest.call_args[1]
+            assert "test1.pdf" in call_args["target_paths"][0]
+            assert "test2.txt" in call_args["target_paths"][1]
 
 def test_ingest_rescan():
     with patch("app.api.documents.run_ingestion") as mock_ingest:

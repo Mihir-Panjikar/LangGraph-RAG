@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from typing import List, Optional
 from langchain_community.vectorstores import Chroma
 from app.ingestion import get_embeddings, run_ingestion
 import os
@@ -49,15 +50,14 @@ def save_upload_file(upload_file: UploadFile, destination: str) -> str:
         upload_file.file.close()
     return destination
 
-from typing import List
-
 @router.post("/ingest")
-async def ingest_documents(files: List[UploadFile] = File(None)):
+async def ingest_documents(files: List[UploadFile] = File(default=None)):
     """
     Ingest new documents or trigger a directory re-scan.
     """
     if files:
         ingested_files = []
+        ingested_file_paths = []
         for file in files:
             ext = os.path.splitext(file.filename)[1].lower()
             if ext not in [".pdf", ".md", ".docx", ".txt"]:
@@ -69,13 +69,15 @@ async def ingest_documents(files: List[UploadFile] = File(None)):
             file_path = os.path.join("data", file.filename)
             save_upload_file(file, file_path)
             
-            # Trigger ingestion for the specific file
-            run_ingestion(target_path=file_path)
             ingested_files.append(file.filename)
+            ingested_file_paths.append(file_path)
         
-        if not ingested_files:
+        if not ingested_file_paths:
             raise HTTPException(status_code=400, detail="No valid files provided for ingestion.")
             
+        # Trigger ingestion for all valid files at once
+        run_ingestion(target_paths=ingested_file_paths)
+        
         return {"message": f"Successfully ingested: {', '.join(ingested_files)}"}
     else:
         # Trigger directory re-scan
