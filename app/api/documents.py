@@ -24,6 +24,10 @@ async def list_documents():
     
     docs_summary = {}
     for meta in metadatas:
+        # Safety check: meta can be None in Chroma results
+        if not meta:
+            continue
+            
         filename = meta.get("filename")
         if not filename:
             source = meta.get("source", "Unknown")

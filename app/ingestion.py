@@ -92,12 +92,24 @@ def get_vector_store(persist_directory="chroma_db"):
     embeddings = get_embeddings()
     return Chroma(persist_directory=persist_directory, embedding_function=embeddings)
 
+import hashlib
+
 def create_vector_store(documents, persist_directory="chroma_db"):
     """
-    Add documents to the vector store.
+    Add documents to the vector store with deterministic IDs to prevent duplicates.
     """
     vector_store = get_vector_store(persist_directory)
-    vector_store.add_documents(documents=documents)
+    
+    # Generate deterministic IDs based on content and filename
+    ids = []
+    for doc in documents:
+        content = doc.page_content
+        filename = doc.metadata.get("filename", "unknown")
+        # Create a hash of content and filename
+        hash_input = f"{filename}_{content}"
+        ids.append(hashlib.md5(hash_input.encode()).hexdigest())
+    
+    vector_store.add_documents(documents=documents, ids=ids)
     return vector_store
 
 def search_vector_store(query, persist_directory="chroma_db", k=3):
