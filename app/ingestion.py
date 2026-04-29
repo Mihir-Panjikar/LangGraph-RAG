@@ -8,6 +8,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharac
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 import os
+import functools
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 
@@ -74,31 +75,36 @@ def chunk_documents(documents, chunk_size=1000, chunk_overlap=100):
             
     return final_chunks
 
+@functools.lru_cache(maxsize=1)
 def get_embeddings():
     """
     Initialize HuggingFace embeddings from a local model path.
+    Caches the instance to avoid reloading the model.
     """
     model_path = os.path.join("models", "all-MiniLM-L6-v2")
     return HuggingFaceEmbeddings(model_name=model_path)
 
-def create_vector_store(documents, persist_directory="chroma_db"):
+@functools.lru_cache(maxsize=1)
+def get_vector_store(persist_directory="chroma_db"):
     """
-    Create a vector store from documents and persist it.
+    Get the Chroma vector store instance. Caches the instance.
     """
     embeddings = get_embeddings()
-    vector_store = Chroma.from_documents(
-        documents=documents,
-        embedding=embeddings,
-        persist_directory=persist_directory
-    )
+    return Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+
+def create_vector_store(documents, persist_directory="chroma_db"):
+    """
+    Add documents to the vector store.
+    """
+    vector_store = get_vector_store(persist_directory)
+    vector_store.add_documents(documents=documents)
     return vector_store
 
 def search_vector_store(query, persist_directory="chroma_db", k=3):
     """
     Search the vector store for the most relevant documents.
     """
-    embeddings = get_embeddings()
-    vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+    vector_store = get_vector_store(persist_directory)
     return vector_store.similarity_search(query, k=k)
 
 def run_ingestion(target_paths: List[str] = None, data_dir: str = "data", persist_db: str = "chroma_db"):

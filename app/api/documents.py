@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List, Optional
 from langchain_community.vectorstores import Chroma
-from app.ingestion import get_embeddings, run_ingestion
+from app.ingestion import get_vector_store, run_ingestion
 import os
 import shutil
 
@@ -9,13 +9,10 @@ router = APIRouter()
 
 # Global Chroma client for the router
 persist_directory = "chroma_db"
-embeddings = get_embeddings()
+vector_store = get_vector_store(persist_directory)
 
 # We export this so it can be mocked in tests
-chroma_client = Chroma(
-    persist_directory=persist_directory, 
-    embedding_function=embeddings
-)._collection
+chroma_client = vector_store._collection
 
 @router.get("/documents")
 async def list_documents():
